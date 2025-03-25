@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Personal Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+        }
+        .chat-box {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #b2cef0;
+            padding: 10px;
+            background-color: #f29ab5;
+        }
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .mic-btn {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #2de933;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-box" id="chatBox"></div>
+    <textarea id="userInput" class="chat-input" placeholder="Type your message..."></textarea>
+    <br>
+    <button class="mic-btn" id="micButton">🎤 Speak</button>
+
+    <script>
+        // Initialize SpeechRecognition and SpeechSynthesis APIs
+        const micButton = document.getElementById('micButton');
+        const userInput = document.getElementById('userInput');
+        const chatBox = document.getElementById('chatBox');
+        
+        let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        let synth = window.speechSynthesis;
+
+        // Handle voice input
+        micButton.addEventListener('click', () => {
+            recognition.start();
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            userInput.value = transcript;
+            handleUserMessage(transcript);
+        };
+
+        // Function to send user message
+        function handleUserMessage(message) {
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.textContent = 'You: ' + message;
+            chatBox.appendChild(userMessageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Respond with AI (could call your backend API here)
+            const response = generateAIResponse(message);
+            setTimeout(() => {
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.textContent = 'AI: ' + response;
+                chatBox.appendChild(aiMessageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Read the response out loud
+                const utterance = new SpeechSynthesisUtterance(response);
+                synth.speak(utterance);
+            }, 1000);
+        }
+
+        // A placeholder for AI response (could use OpenAI API)
+        function generateAIResponse(message) {
+            return "This is a sample response to: " + message;
+        }
+    </script>
+</body>
+</html>
